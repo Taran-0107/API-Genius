@@ -21,6 +21,50 @@ This repository contains the **Flask backend**, which powers the entire applicat
 
 ---
 
+## 📸 Application Screenshots
+
+<table>
+<tr>
+<td align="center">
+<b>Home</b><br>
+<img src="images/home.png" width="450">
+</td>
+<td align="center">
+<b>Home</b><br>
+<img src="images/home2.png" width="450">
+</td>
+</tr>
+
+<tr>
+<td align="center">
+<b>Discover APIs</b><br>
+<img src="images/discoverpage.png" width="450">
+</td>
+<td align="center">
+<b>API Community</b><br>
+<img src="images/community.png" width="450">
+</td>
+</tr>
+
+<tr>
+<td align="center">
+<b>Code Generation</b><br>
+<img src="images/code.png" width="450">
+</td>
+<td align="center">
+<b>Key Manager</b><br>
+<img src="images/keymanager.png" width="450">
+</td>
+</tr>
+
+<tr>
+<td align="center" colspan="2">
+<b>User Profile</b><br>
+<img src="images/profile.png" width="700">
+</td>
+</tr>
+</table>
+
 ## 🛠️ Tech Stack
 
 | Area       | Technology |
