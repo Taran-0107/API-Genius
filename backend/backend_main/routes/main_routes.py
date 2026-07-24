@@ -91,6 +91,7 @@ def get_apis():
         return jsonify({'error': 'Failed to fetch APIs'}), 500
 
 @main_bp.route('/apis/discover', methods=['POST'])
+@jwt_required()
 def discover_apis():
     """
     Discover new APIs from the web using the agent, store them, and return results.
@@ -492,15 +493,37 @@ def get_questions():
         per_page = int(request.args.get('per_page', 20))
         
         query = """
-        SELECT q.*, u.username,
-               COUNT(a.id) as answer_count,
-               SUM(CASE WHEN v.vote_type = 'up' THEN 1 ELSE 0 END) as upvotes,
-               SUM(CASE WHEN v.vote_type = 'down' THEN 1 ELSE 0 END) as downvotes
-        FROM questions q
-        JOIN users u ON q.user_id = u.id
-        LEFT JOIN answers a ON q.id = a.question_id
-        LEFT JOIN votes v ON q.id = v.entity_id AND v.entity_type = 'question'
-        WHERE 1=1
+            SELECT
+                q.*,
+                u.username,
+                COALESCE(ans.answer_count, 0) AS answer_count,
+                COALESCE(v.upvotes, 0) AS upvotes,
+                COALESCE(v.downvotes, 0) AS downvotes
+            FROM questions q
+            JOIN users u
+                ON q.user_id = u.id
+
+            LEFT JOIN (
+                SELECT
+                    question_id,
+                    COUNT(*) AS answer_count
+                FROM answers
+                GROUP BY question_id
+            ) ans
+            ON ans.question_id = q.id
+
+            LEFT JOIN (
+                SELECT
+                    entity_id,
+                    COUNT(*) FILTER (WHERE vote_type='up') AS upvotes,
+                    COUNT(*) FILTER (WHERE vote_type='down') AS downvotes
+                FROM votes
+                WHERE entity_type='question'
+                GROUP BY entity_id
+            ) v
+            ON v.entity_id = q.id
+
+            WHERE 1=1
         """
         params = {}
         
@@ -512,7 +535,7 @@ def get_questions():
             query += " AND (q.title LIKE :search OR q.body_md LIKE :search)"
             params['search'] = f"%{search}%"
         
-        query += " GROUP BY q.id ORDER BY q.created_at DESC"
+        query += " ORDER BY q.created_at DESC"
         query += f" LIMIT {per_page} OFFSET {(page - 1) * per_page}"
         
         questions = DatabaseManager.execute_query(query, params)
@@ -599,14 +622,29 @@ def get_answers(question_id):
     """Get all answers for a question"""
     try:
         query = """
-        SELECT a.*, u.username,
-               SUM(CASE WHEN v.vote_type = 'up' THEN 1 ELSE 0 END) as upvotes,
-               SUM(CASE WHEN v.vote_type = 'down' THEN 1 ELSE 0 END) as downvotes
+        SELECT
+            a.*,
+            u.username,
+            COALESCE(v.upvotes, 0) AS upvotes,
+            COALESCE(v.downvotes, 0) AS downvotes
         FROM answers a
-        JOIN users u ON a.user_id = u.id
-        LEFT JOIN votes v ON a.id = v.entity_id AND v.entity_type = 'answer'
+
+        JOIN users u
+            ON a.user_id = u.id
+
+        LEFT JOIN (
+            SELECT
+                entity_id,
+                COUNT(*) FILTER (WHERE vote_type = 'up') AS upvotes,
+                COUNT(*) FILTER (WHERE vote_type = 'down') AS downvotes
+            FROM votes
+            WHERE entity_type = 'answer'
+            GROUP BY entity_id
+        ) v
+            ON a.id = v.entity_id
+
         WHERE a.question_id = :question_id
-        GROUP BY a.id
+
         ORDER BY a.created_at ASC
         """
         answers = DatabaseManager.execute_query(query, {'question_id': question_id})

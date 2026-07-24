@@ -1,6 +1,9 @@
 # config.py
 import os
 from datetime import timedelta
+import dotenv
+
+dotenv.load_dotenv()  # Load environment variables from .env file
 
 class Config:
     """Base configuration class"""
@@ -16,13 +19,9 @@ class Config:
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=int(os.getenv('JWT_REFRESH_DAYS', 30)))
     
     # Database settings
-    DB_HOST = os.getenv('DB_HOST', 'localhost')
-    DB_PORT = int(os.getenv('DB_PORT', 3306))
-    DB_USER = os.getenv('DB_USER', 'root')
-    DB_PASSWORD = os.getenv('DB_PASSWORD', '')
-    DB_NAME = os.getenv('DB_NAME', 'api_app')
+    DB_URI = os.getenv('DB_URI')
     
-    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}?charset=utf8mb4"
+    SQLALCHEMY_DATABASE_URI = DB_URI
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # AI/LLM settings (Cohere)
@@ -60,7 +59,7 @@ class TestingConfig(Config):
     """Testing configuration"""
     TESTING = True
     DB_NAME = 'api_app_test'
-    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{Config.DB_USER}:{Config.DB_PASSWORD}@{Config.DB_HOST}:{Config.DB_PORT}/api_app_test?charset=utf8mb4"
+    SQLALCHEMY_DATABASE_URI = os.getenv('DB_URI')
 
 class ProductionConfig(Config):
     """Production configuration"""

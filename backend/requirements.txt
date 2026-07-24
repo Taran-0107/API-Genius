@@ -17,3 +17,7 @@ python-dotenv==1.0.0
 redis==5.0.1
 celery==5.3.4
 gunicorn==21.2.0
+langchain_google_genai
+json5
+ddgs
+webdriver_manager
