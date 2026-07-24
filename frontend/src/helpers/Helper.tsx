@@ -1,33 +1,35 @@
+const BACKEND_URL = import.meta.env.BACKEND_URL || '/api';
+
 const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
-    const response = await fetch(`/api${endpoint}`, {
-        ...options, // Spread the incoming options first
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers, // Then, correctly merge any existing headers from the options
-        },
-    });
-    
-    if (!response.ok) {
-        const contentType = response.headers.get('content-type');
-        let error;
-        if (contentType && contentType.includes('application/json')) {
-            const errData = await response.json();
-            error = new Error(errData.error || `Request failed with status ${response.status}`);
-        } else {
-            const textError = await response.text();
-            error = new Error(textError || `Request failed with status ${response.status}`);
-        }
-        throw error;
+  const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+    ...options, // Spread the incoming options first
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers, // Then, correctly merge any existing headers from the options
+    },
+  });
+
+  if (!response.ok) {
+    const contentType = response.headers.get('content-type');
+    let error;
+    if (contentType && contentType.includes('application/json')) {
+      const errData = await response.json();
+      error = new Error(errData.error || `Request failed with status ${response.status}`);
+    } else {
+      const textError = await response.text();
+      error = new Error(textError || `Request failed with status ${response.status}`);
     }
-    
-    return response.json();
+    throw error;
+  }
+
+  return response.json();
 };
 
 const apiFetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
   const token = localStorage.getItem('access_token');
 
   // If a token exists, add the Authorization header
-  if (token!=undefined) {
+  if (token != undefined) {
     console.log('Using token:', token);
     options.headers = {
       ...options.headers,
