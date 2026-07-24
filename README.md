@@ -8,7 +8,8 @@ It leverages **Large Language Models (LLMs)** through Cohere to provide an intel
 
 This repository contains the **Flask backend**, which powers the entire application and serves a simple HTML/Alpine.js frontend for testing and demonstration purposes.
 
-**Live Demo  [Link](https://api-genius.vercel.app/)
+**Live Demo**  
+[Link](https://api-genius.vercel.app/)
 ---
 
 ## ✨ Key Features
