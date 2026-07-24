@@ -21,3 +21,4 @@ langchain_google_genai
 json5
 ddgs
 webdriver_manager
+psycopg2-binary
