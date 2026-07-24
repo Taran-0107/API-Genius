@@ -23,7 +23,7 @@ def create_app(config_name='development'):
     logging.basicConfig(level=logging.INFO)
     
     # --- Initialize Extensions ---
-    cors.init_app(app)#, origins=["http://localhost:3000", "http://localhost:5000"])
+    cors.init_app(app,origins=[app.config['FRONTEND_URL']])#, origins=["http://localhost:3000", "http://localhost:5000"])
     jwt.init_app(app)
     init_database(app.config['SQLALCHEMY_DATABASE_URI'])
     

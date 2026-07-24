@@ -12,6 +12,8 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     TESTING = False
+
+    FRONTEND_URL=os.getenv('FRONTEND_URL')
     
     # JWT settings
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
